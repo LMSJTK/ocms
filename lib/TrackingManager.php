@@ -207,6 +207,6 @@ class TrackingManager {
      * Generate unique ID
      */
     private function generateUniqueId() {
-        return bin2hex(random_bytes(16));
+        return generateUUID4();
     }
 }

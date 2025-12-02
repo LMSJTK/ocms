@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS global.content
     email_body_html text,
     email_attachment_filename text,
     email_attachment_content bytea,
-    thumbnail_filename text,
-    thumbnail_content bytea,
+    thumbnail_filename text, -- Full URL to thumbnail image
     tags text, -- Comma-separated list of tags for quick display
     difficulty text, -- NIST Phish Scales difficulty score (1-5)
     created_at timestamp DEFAULT now(),

@@ -196,3 +196,20 @@ function validateBearerToken($config) {
 
     // Token is valid, continue
 }
+
+/**
+ * Helper function to generate a UUID4 (RFC 4122 compliant)
+ * Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+ */
+function generateUUID4() {
+    $data = random_bytes(16);
+
+    // Set version to 0100 (UUID version 4)
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+
+    // Set bits 6-7 to 10 (RFC 4122 variant)
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+    // Format as UUID with dashes
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}

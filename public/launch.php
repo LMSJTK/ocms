@@ -11,14 +11,43 @@ $baseUrl = $config['app']['base_url'];
 $parsedUrl = parse_url($baseUrl);
 $basePath = $parsedUrl['path'] ?? '';
 
-// URL format: ?trackingId=xyz789&content=abc123
-$trackingLinkId = $_GET['trackingId'] ?? null;
-$contentId = $_GET['content'] ?? null;
+// URL format:
+// New: ?trackingId=[BASE64_ENCODED_STRING] where decoded = {training type}:{content ID}:{unique tracking ID}
+// Old (backward compat): ?trackingId=xyz789&content=abc123
 
-if (!$trackingLinkId || !$contentId) {
+$trackingParam = $_GET['trackingId'] ?? null;
+$contentIdParam = $_GET['content'] ?? null;
+
+if (!$trackingParam) {
     http_response_code(400);
-    echo '<h1>Error: Missing tracking information or content ID</h1>';
+    echo '<h1>Error: Missing tracking information</h1>';
     exit;
+}
+
+// Try to decode as base64 (new format)
+$decoded = base64_decode($trackingParam, true);
+if ($decoded && strpos($decoded, ':') !== false) {
+    // New format: {training type}:{content ID}:{unique tracking ID}
+    $parts = explode(':', $decoded, 3);
+    if (count($parts) === 3) {
+        $trainingType = $parts[0];
+        $contentId = $parts[1];
+        $trackingLinkId = $parts[2];
+    } else {
+        http_response_code(400);
+        echo '<h1>Error: Invalid tracking format</h1>';
+        exit;
+    }
+} else {
+    // Old format (backward compatibility): trackingId=xyz&content=abc
+    if (!$contentIdParam) {
+        http_response_code(400);
+        echo '<h1>Error: Missing content ID for legacy format</h1>';
+        exit;
+    }
+    $trackingLinkId = $trackingParam;
+    $contentId = $contentIdParam;
+    $trainingType = null; // Not available in old format
 }
 
 try {

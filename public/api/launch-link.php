@@ -69,9 +69,9 @@ try {
     }
 
     // Generate unique IDs
-    $trainingId = bin2hex(random_bytes(16));
-    $trainingTrackingId = bin2hex(random_bytes(16));
-    $uniqueTrackingId = bin2hex(random_bytes(16));
+    $trainingId = generateUUID4();
+    $trainingTrackingId = generateUUID4();
+    $uniqueTrackingId = generateUUID4();
 
     // Create training record
     $trainingRecord = [
@@ -107,8 +107,11 @@ try {
         $trainingTrackingData
     );
 
-    // Build full launch URL with new format
-    $fullLaunchUrl = rtrim($domainUrl, '/') . '/launch.php?trackingId=' . $uniqueTrackingId . '&content=' . $contentId;
+    // Build full launch URL with base64 encoded tracking parameter
+    // Format: {training type}:{content ID}:{unique tracking ID}
+    $trackingData = $trainingRecord['training_type'] . ':' . $contentId . ':' . $uniqueTrackingId;
+    $encodedTracking = base64_encode($trackingData);
+    $fullLaunchUrl = rtrim($domainUrl, '/') . '/launch.php?trackingId=' . $encodedTracking;
 
     sendJSON([
         'success' => true,
