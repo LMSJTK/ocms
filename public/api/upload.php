@@ -26,9 +26,9 @@ validateBearerToken($config);
  */
 function generatePreviewLink($contentId, $db, $trackingManager, $config) {
     // Generate unique IDs for preview
-    $trainingId = bin2hex(random_bytes(16));
-    $trainingTrackingId = bin2hex(random_bytes(16));
-    $uniqueTrackingId = bin2hex(random_bytes(16));
+    $trainingId = generateUUID4();
+    $trainingTrackingId = generateUUID4();
+    $uniqueTrackingId = generateUUID4();
 
     // Get content details for training name
     $content = $db->fetchOne(
@@ -70,8 +70,11 @@ function generatePreviewLink($contentId, $db, $trackingManager, $config) {
         $trainingTrackingData
     );
 
-    // Build preview URL with new format
-    $previewUrl = rtrim($config['app']['base_url'], '/') . '/public/launch.php?trackingId=' . $uniqueTrackingId . '&content=' . $contentId;
+    // Build preview URL with base64 encoded tracking parameter
+    // Format: {training type}:{content ID}:{unique tracking ID}
+    $trackingData = $trainingRecord['training_type'] . ':' . $contentId . ':' . $uniqueTrackingId;
+    $encodedTracking = base64_encode($trackingData);
+    $previewUrl = rtrim($config['app']['base_url'], '/') . '/public/launch.php?trackingId=' . $encodedTracking;
 
     // Update content with preview link
     $db->update('content',
@@ -85,7 +88,7 @@ function generatePreviewLink($contentId, $db, $trackingManager, $config) {
 
 /**
  * Process thumbnail upload
- * Returns array with 'filename' and 'content' keys, or null if no thumbnail
+ * Returns full URL to the thumbnail, or null if no thumbnail
  */
 function processThumbnail($contentId, $config) {
     if (!isset($_FILES['thumbnail']) || $_FILES['thumbnail']['error'] === UPLOAD_ERR_NO_FILE) {
@@ -117,13 +120,10 @@ function processThumbnail($contentId, $config) {
         throw new Exception('Failed to save thumbnail file');
     }
 
-    // Read file content as binary for database storage
-    $thumbnailContent = file_get_contents($thumbnailPath);
+    // Build full URL to thumbnail
+    $thumbnailUrl = rtrim($config['app']['base_url'], '/') . '/content/' . $contentId . '/' . $thumbnailFilename;
 
-    return [
-        'filename' => $thumbnailFilename,
-        'content' => $thumbnailContent
-    ];
+    return $thumbnailUrl;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -168,7 +168,7 @@ try {
     }
 
     // Generate unique content ID
-    $contentId = bin2hex(random_bytes(16));
+    $contentId = generateUUID4();
 
     // Handle different content types
     switch ($contentType) {
@@ -192,7 +192,7 @@ try {
             }
 
             // Process thumbnail if provided
-            $thumbnail = processThumbnail($contentId, $config);
+            $thumbnailUrl = processThumbnail($contentId, $config);
 
             // Insert content record
             $insertData = [
@@ -209,9 +209,8 @@ try {
                 $insertData['domain_id'] = $domainId;
             }
 
-            if ($thumbnail !== null) {
-                $insertData['thumbnail_filename'] = $thumbnail['filename'];
-                $insertData['thumbnail_content'] = $thumbnail['content'];
+            if ($thumbnailUrl !== null) {
+                $insertData['thumbnail_filename'] = $thumbnailUrl;
             }
 
             $db->insert('content', $insertData);
@@ -256,7 +255,7 @@ try {
             }
 
             // Process thumbnail if provided
-            $thumbnail = processThumbnail($contentId, $config);
+            $thumbnailUrl = processThumbnail($contentId, $config);
 
             // Insert content record
             $insertData = [
@@ -273,9 +272,8 @@ try {
                 $insertData['domain_id'] = $domainId;
             }
 
-            if ($thumbnail !== null) {
-                $insertData['thumbnail_filename'] = $thumbnail['filename'];
-                $insertData['thumbnail_content'] = $thumbnail['content'];
+            if ($thumbnailUrl !== null) {
+                $insertData['thumbnail_filename'] = $thumbnailUrl;
             }
 
             $db->insert('content', $insertData);
@@ -299,7 +297,7 @@ try {
             }
 
             // Process thumbnail if provided
-            $thumbnail = processThumbnail($contentId, $config);
+            $thumbnailUrl = processThumbnail($contentId, $config);
 
             // Insert content record
             $insertData = [
@@ -316,9 +314,8 @@ try {
                 $insertData['domain_id'] = $domainId;
             }
 
-            if ($thumbnail !== null) {
-                $insertData['thumbnail_filename'] = $thumbnail['filename'];
-                $insertData['thumbnail_content'] = $thumbnail['content'];
+            if ($thumbnailUrl !== null) {
+                $insertData['thumbnail_filename'] = $thumbnailUrl;
             }
 
             $db->insert('content', $insertData);
@@ -346,7 +343,7 @@ try {
             }
 
             // Process thumbnail if provided
-            $thumbnail = processThumbnail($contentId, $config);
+            $thumbnailUrl = processThumbnail($contentId, $config);
 
             // Insert content record
             $insertData = [
@@ -363,9 +360,8 @@ try {
                 $insertData['domain_id'] = $domainId;
             }
 
-            if ($thumbnail !== null) {
-                $insertData['thumbnail_filename'] = $thumbnail['filename'];
-                $insertData['thumbnail_content'] = $thumbnail['content'];
+            if ($thumbnailUrl !== null) {
+                $insertData['thumbnail_filename'] = $thumbnailUrl;
             }
 
             $db->insert('content', $insertData);
@@ -419,7 +415,7 @@ try {
             }
 
             // Process thumbnail if provided
-            $thumbnail = processThumbnail($contentId, $config);
+            $thumbnailUrl = processThumbnail($contentId, $config);
 
             // Save email HTML to temp file
             $tempPath = $config['content']['upload_dir'] . 'temp_' . $contentId . '.html';
@@ -449,10 +445,9 @@ try {
                 $insertData['email_attachment_content'] = $attachmentContent;
             }
 
-            // Add thumbnail fields if thumbnail was provided
-            if ($thumbnail !== null) {
-                $insertData['thumbnail_filename'] = $thumbnail['filename'];
-                $insertData['thumbnail_content'] = $thumbnail['content'];
+            // Add thumbnail field if thumbnail was provided
+            if ($thumbnailUrl !== null) {
+                $insertData['thumbnail_filename'] = $thumbnailUrl;
             }
 
             $db->insert('content', $insertData);

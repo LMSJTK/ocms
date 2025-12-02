@@ -432,14 +432,14 @@ class ClaudeAPI {
             "PHISHING CUE TYPES AND CRITERIA:\n" .
             $cueDocumentation . "\n" .
             "NIST Phish Scale Difficulty Ratings:\n" .
-            "- Least Difficult (1): Multiple obvious red flags, amateur mistakes, very easy to detect\n" .
-            "- Moderately Difficult (2): Some red flags but requires closer inspection, decent attempt\n" .
-            "- Very Difficult (3): Sophisticated, few obvious indicators, requires expert knowledge to detect\n\n" .
+            "- least difficult: Multiple obvious red flags, amateur mistakes, very easy to detect\n" .
+            "- Moderately difficult: Some red flags but requires closer inspection, decent attempt\n" .
+            "- very difficult: Sophisticated, few obvious indicators, requires expert knowledge to detect\n\n" .
             "Rules:\n" .
             "1. Add data-cue attributes to elements containing phishing indicators\n" .
             "2. Use format: data-cue=\"cue-name\" using the exact cue names from the list above (e.g., data-cue=\"sense-of-urgency\")\n" .
             "3. Use ONLY the cue names provided in the list - these are the standardized NIST Phish Scale indicators\n" .
-            "4. On the FIRST line, output: DIFFICULTY:X (where X is 1, 2, or 3)\n" .
+            "4. On the FIRST line, output: DIFFICULTY:X (where X is one of: \"least difficult\", \"Moderately difficult\", or \"very difficult\")\n" .
             "5. Then output the complete modified HTML with data-cue attributes added\n" .
             "6. Do not modify the content or structure, only add data-cue attributes\n" .
             "7. Do not include any other explanations, comments, or markdown formatting\n" .
@@ -453,18 +453,26 @@ class ClaudeAPI {
             [
                 'role' => 'user',
                 'content' => "Add data-cue attributes to phishing indicators in this email using the standardized cue names, and assess its difficulty level. " .
-                    "First line must be DIFFICULTY:X (1, 2, or 3), then the modified HTML:\n\n" . $emailHTML
+                    "First line must be DIFFICULTY:X (where X is \"least difficult\", \"Moderately difficult\", or \"very difficult\"), then the modified HTML:\n\n" . $emailHTML
             ]
         ];
 
         $response = $this->sendRequest($messages, $systemPrompt);
 
-        // Extract difficulty score from first line
-        $difficulty = 2; // Default to moderate
-        if (preg_match('/^DIFFICULTY:\s*(\d+)/i', $response, $diffMatch)) {
-            $difficulty = intval($diffMatch[1]);
+        // Extract difficulty level from first line
+        $difficulty = 'Moderately difficult'; // Default to moderate
+        if (preg_match('/^DIFFICULTY:\s*(.+?)$/im', $response, $diffMatch)) {
+            $difficultyText = trim($diffMatch[1]);
+            // Normalize the difficulty text to match our standard format
+            if (stripos($difficultyText, 'least') !== false) {
+                $difficulty = 'least difficult';
+            } elseif (stripos($difficultyText, 'very') !== false) {
+                $difficulty = 'very difficult';
+            } elseif (stripos($difficultyText, 'moderate') !== false) {
+                $difficulty = 'Moderately difficult';
+            }
             // Remove the difficulty line from response
-            $response = preg_replace('/^DIFFICULTY:\s*\d+\s*\n?/i', '', $response);
+            $response = preg_replace('/^DIFFICULTY:\s*.+?\n?/im', '', $response);
         }
 
         // Strip any markdown code blocks and explanatory text

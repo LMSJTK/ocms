@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS content
     email_body_html LONGTEXT,
     email_attachment_filename VARCHAR(255),
     email_attachment_content LONGBLOB,
-    thumbnail_filename VARCHAR(255),
-    thumbnail_content LONGBLOB,
+    thumbnail_filename TEXT, -- Full URL to thumbnail image
     tags TEXT, -- Comma-separated list of tags for quick display
     difficulty VARCHAR(10), -- NIST Phish Scales difficulty score (1-5)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
