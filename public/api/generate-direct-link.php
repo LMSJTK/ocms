@@ -92,11 +92,11 @@ try {
         }
     }
 
-    // Build direct launch URL with base64 encoded tracking parameter
-    // Format: {training type}:{content ID}:{unique tracking ID}
-    $trackingData = $trainingRecord['training_type'] . ':' . $contentId . ':' . $uniqueTrackingId;
-    $encodedTracking = base64_encode($trackingData);
-    $directUrl = rtrim($domainUrl, '/') . '/launch.php?trackingId=' . $encodedTracking;
+    // Build direct launch URL with PATH_INFO format (dashless IDs)
+    // Format: /launch.php/{content_id_without_dashes}/{tracking_id_without_dashes}
+    $contentIdNoDash = str_replace('-', '', $contentId);
+    $trackingIdNoDash = str_replace('-', '', $uniqueTrackingId);
+    $directUrl = rtrim($domainUrl, '/') . '/launch.php/' . $contentIdNoDash . '/' . $trackingIdNoDash;
 
     sendJSON([
         'success' => true,

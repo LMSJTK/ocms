@@ -70,11 +70,11 @@ function generatePreviewLink($contentId, $db, $trackingManager, $config) {
         $trainingTrackingData
     );
 
-    // Build preview URL with base64 encoded tracking parameter
-    // Format: {training type}:{content ID}:{unique tracking ID}
-    $trackingData = $trainingRecord['training_type'] . ':' . $contentId . ':' . $uniqueTrackingId;
-    $encodedTracking = base64_encode($trackingData);
-    $previewUrl = rtrim($config['app']['base_url'], '/') . '/public/launch.php?trackingId=' . $encodedTracking;
+    // Build preview URL with PATH_INFO format (dashless IDs)
+    // Format: /launch.php/{content_id_without_dashes}/{tracking_id_without_dashes}
+    $contentIdNoDash = str_replace('-', '', $contentId);
+    $trackingIdNoDash = str_replace('-', '', $uniqueTrackingId);
+    $previewUrl = rtrim($config['app']['base_url'], '/') . '/public/launch.php/' . $contentIdNoDash . '/' . $trackingIdNoDash;
 
     // Update content with preview link
     $db->update('content',

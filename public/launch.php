@@ -12,34 +12,44 @@ $parsedUrl = parse_url($baseUrl);
 $basePath = $parsedUrl['path'] ?? '';
 
 // URL format:
-// New: ?trackingId=[BASE64_ENCODED_STRING] where decoded = {training type}:{content ID}:{unique tracking ID}
+// New: /launch.php/{arbitrary paths}/{content_id_without_dashes}/{tracking_id_without_dashes}
 // Old (backward compat): ?trackingId=xyz789&content=abc123
 
+$pathInfo = $_SERVER['PATH_INFO'] ?? null;
 $trackingParam = $_GET['trackingId'] ?? null;
 $contentIdParam = $_GET['content'] ?? null;
 
-if (!$trackingParam) {
-    http_response_code(400);
-    echo '<h1>Error: Missing tracking information</h1>';
-    exit;
-}
+// Try new PATH_INFO format first
+if ($pathInfo) {
+    // Parse PATH_INFO: /arbitrary/paths/contentid/trackingid
+    // Extract last two path segments
+    $pathSegments = array_values(array_filter(explode('/', $pathInfo), function($seg) {
+        return $seg !== '';
+    }));
 
-// Try to decode as base64 (new format)
-$decoded = base64_decode($trackingParam, true);
-if ($decoded && strpos($decoded, ':') !== false) {
-    // New format: {training type}:{content ID}:{unique tracking ID}
-    $parts = explode(':', $decoded, 3);
-    if (count($parts) === 3) {
-        $trainingType = $parts[0];
-        $contentId = $parts[1];
-        $trackingLinkId = $parts[2];
+    if (count($pathSegments) >= 2) {
+        // Get last two segments
+        $contentIdDashless = $pathSegments[count($pathSegments) - 2];
+        $trackingIdDashless = $pathSegments[count($pathSegments) - 1];
+
+        // Restore dashes to UUIDs
+        $contentId = restoreUUIDDashes($contentIdDashless);
+        $trackingLinkId = restoreUUIDDashes($trackingIdDashless);
+
+        if (!$contentId || !$trackingLinkId) {
+            http_response_code(400);
+            echo '<h1>Error: Invalid ID format in URL</h1>';
+            exit;
+        }
+
+        $trainingType = null; // Not available in PATH_INFO format
     } else {
         http_response_code(400);
-        echo '<h1>Error: Invalid tracking format</h1>';
+        echo '<h1>Error: Invalid URL format</h1>';
         exit;
     }
-} else {
-    // Old format (backward compatibility): trackingId=xyz&content=abc
+} elseif ($trackingParam) {
+    // Old query string format (backward compatibility): ?trackingId=xyz&content=abc
     if (!$contentIdParam) {
         http_response_code(400);
         echo '<h1>Error: Missing content ID for legacy format</h1>';
@@ -47,7 +57,11 @@ if ($decoded && strpos($decoded, ':') !== false) {
     }
     $trackingLinkId = $trackingParam;
     $contentId = $contentIdParam;
-    $trainingType = null; // Not available in old format
+    $trainingType = null;
+} else {
+    http_response_code(400);
+    echo '<h1>Error: Missing tracking information</h1>';
+    exit;
 }
 
 try {
