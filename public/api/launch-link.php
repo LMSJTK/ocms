@@ -107,11 +107,11 @@ try {
         $trainingTrackingData
     );
 
-    // Build full launch URL with base64 encoded tracking parameter
-    // Format: {training type}:{content ID}:{unique tracking ID}
-    $trackingData = $trainingRecord['training_type'] . ':' . $contentId . ':' . $uniqueTrackingId;
-    $encodedTracking = base64_encode($trackingData);
-    $fullLaunchUrl = rtrim($domainUrl, '/') . '/launch.php?trackingId=' . $encodedTracking;
+    // Build full launch URL with PATH_INFO format (dashless IDs)
+    // Format: /launch.php/{content_id_without_dashes}/{tracking_id_without_dashes}
+    $contentIdNoDash = str_replace('-', '', $contentId);
+    $trackingIdNoDash = str_replace('-', '', $uniqueTrackingId);
+    $fullLaunchUrl = rtrim($domainUrl, '/') . '/launch.php/' . $contentIdNoDash . '/' . $trackingIdNoDash;
 
     sendJSON([
         'success' => true,

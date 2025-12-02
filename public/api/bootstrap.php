@@ -213,3 +213,25 @@ function generateUUID4() {
     // Format as UUID with dashes
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
+
+/**
+ * Helper function to restore dashes to a UUID from dashless format
+ * Converts: abc123def456789012345678901234567890
+ * To:       abc123de-f456-7890-1234-567890123456
+ */
+function restoreUUIDDashes($dashlessUUID) {
+    // Remove any existing dashes (in case they're there)
+    $clean = str_replace('-', '', $dashlessUUID);
+
+    // Validate length (should be 32 hex characters)
+    if (strlen($clean) !== 32) {
+        return null;
+    }
+
+    // Insert dashes at the proper positions: 8-4-4-4-12
+    return substr($clean, 0, 8) . '-' .
+           substr($clean, 8, 4) . '-' .
+           substr($clean, 12, 4) . '-' .
+           substr($clean, 16, 4) . '-' .
+           substr($clean, 20);
+}
