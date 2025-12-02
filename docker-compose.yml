@@ -1,0 +1,16 @@
+services:
+  ocms-service:
+    image: $ARTIFACTORY_REGISTRY/ocms-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: headless-cms
+    ports:
+      - "8080:80"
+    volumes:
+      # Persist uploaded content so it survives container restarts
+      - ./content:/var/www/html/content
+      # Mount config so you can edit it without rebuilding
+
+volumes:
+  db_data:

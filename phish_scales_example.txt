@@ -1,0 +1,49 @@
+<div class="email" role="article" aria-label="Account security notification">
+  <div class="header">
+    <div class="logo" aria-hidden="true" data-cues="visual" data-tip="No/minimal branding: Placeholder logo, not true brand image">ACME</div>
+    <div>
+      <div style="font-weight: bold;" data-mce-style="font-weight: bold;">Acme Bank Security</div>
+      <div class="from-line">
+        From: Acme Bank Security &lt;<strong data-cues="technical" data-tip="Domain spoofing: Sender email domain does not match actual acmebank.com">acct-notify@acme-security-alerts.com</strong>&gt;
+      </div>
+      <div class="muted small-note"><span data-cues="language" data-tip="Generic greeting: Uses 'Dear Customer' instead of your real name"><em>Dear Customer</em></span></div>
+    </div>
+  </div>
+  <h2><span data-cues="language common" data-tip="Urgency: URGENT, calls for immediate action">URGENT: Verify your account information now</span></h2>
+  <p>
+    Dear Customer, 
+    <span data-cues="errors" data-tip="Spelling/grammar: '24hrs', odd punctuation and phrasing.">We have detected <strong>unusual log-in attempts</strong> on your account. To avoid immediate suspension, you must verify your account within <strong>24hrs</strong> or your access will be <em>terminated.</em></span>
+  </p>
+  <p>
+    Please click the button below to view a suspicious "invoice" and confirm that you recognize these charges.
+  </p>
+  <a class="btn danger" href="http://downloads.acme-secure-verification.com/invoice_viewer_v2.exe" title="View Invoice (PDF)" target="_blank" rel="noopener noreferrer" data-mce-href="http://downloads.acme-secure-verification.com/invoice_viewer_v2.exe" data-cues="technical" data-tip="URL hyperlinking: Button says PDF but link is .exe from a suspicious domain"> View Invoice (PDF) </a>
+  <div class="attachment">
+    <strong>Attachment:</strong> 
+    <span data-cues="technical" data-tip="Attachment type: .exe file is attached, which is not common for legitimate emails">invoice_7829.pdf.exe — 2.3 MB</span>
+    <div class="small-note">If the button fails, download and run the attached viewer to see your invoice.</div>
+  </div>
+  <p>
+    <span data-cues="language" data-tip="Request for sensitive info: Asks for username and password. Threats and legal-sounding language used.">After opening the invoice, you will be asked to <strong>re-enter your username and password</strong> to confirm ownership. Failure to verify within 24hrs may result in additional fees and legal action.</span>
+  </p>
+  <p class="muted">
+    <span data-cues="language" data-tip="Request for PII: Social Security number and date of birth">For your security, we also require you to confirm your Social Security number and date of birth on the verification page.</span>
+  </p>
+  <hr style="border: none; border-top: 1px solid #eee; margin: 18px 0;" data-mce-style="border: none; border-top: 1px solid #eee; margin: 18px 0;">
+  <p class="muted">
+    <span data-cues="errors" data-tip="Inconsistency: Estonia location claim does not match Acme Bank branding">Transaction ID: <strong>ACM-9981-XX</strong> • Branch Code: <strong>039</strong> • Ref: <em>recon-220</em><br>This message was sent from a secure server in Tallinn, Estonia.</span>
+  </p>
+  <p>
+    <span data-cues="language" data-tip="Lack of signer details: No contact info, just team name.">Sincerely,<br><strong>Acme Bank Security Team</strong><br></span>
+  </p>
+  <footer>
+    <div class="muted small-note">
+      <img src="http://acme-secure-alerts.com/badge.png" alt="Security Badge" width="80" style="vertical-align: middle;" data-mce-style="vertical-align: middle;" data-mce-src="http://acme-secure-alerts.com/badge.png" data-cues="visual" data-tip="Suspicious security badge: Not a real or expected brand security icon.">
+      <span data-cues="language" data-tip="Legal language: Threats of account seizure, pressuring compliance.">This email is legally protected. Failure to comply may lead to account seizure. © 2025 Acme Bank.</span>
+    </div>
+    <p class="small-note">
+      Need help? Visit 
+      <a class="bad-link" href="http://acct-support.acmebank.verify-login.com/help" data-mce-href="http://acct-support.acmebank.verify-login.com/help" data-cues="technical" data-tip="URL hyperlinking: Link text shows acmebank.com/support but actually goes to a lookalike/suspicious domain">https://www.acmebank.com/support</a>
+    </p>
+  </footer>
+</div>

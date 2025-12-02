@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCMS API Testing Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .tab:hover {
+            color: #2980b9;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        button[type="submit"] {
+            background: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background: #2980b9;
+        }
+
+        button[type="submit"]:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .content-list {
+            margin-top: 30px;
+        }
+
+        .content-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .content-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: #e0e0e0;
+        }
+
+        .content-thumbnail-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #95a5a6;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .content-info {
+            flex: 1;
+        }
+
+        .content-info h3 {
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .content-info p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .content-actions button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .content-actions button:hover {
+            background: #2980b9;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tag {
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+        .modal-footer button {
+            margin-left: 10px;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OCMS API Testing Tool</h1>
+            <p class="subtitle">Upload and manage SCORM, HTML, Email, and Video content</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('upload')">Upload Content</button>
+            <button class="tab" onclick="switchTab('manage')">Manage Content</button>
+            <button class="tab" onclick="switchTab('launch')">Generate Launch Link (API)</button>
+            <button class="tab" onclick="switchTab('directlink')">Generate Direct Link</button>
+            <button class="tab" onclick="switchTab('domains')">Manage Domains</button>
+            <button class="tab" onclick="window.location.href='/ocms/public/sns-monitor.html';">View SNS Queue</button>
+            <button class="tab" onclick="window.location.href='/ocms/API_EXAMPLES.md';">API Examples</button>
+        </div>
+
+        <!-- Upload Tab -->
+        <div id="upload-tab" class="tab-content active">
+            <div id="upload-alert" class="alert"></div>
+
+            <div class="form-group">
+                <label>Content Type</label>
+                <select id="content-type-selector" onchange="showUploadForm()">
+                    <option value="">Select content type...</option>
+                    <option value="scorm">SCORM Package (ZIP)</option>
+                    <option value="html">HTML Package (ZIP)</option>
+                    <option value="training">Raw HTML (Textarea)</option>
+                    <option value="landing">Landing Page (HTML)</option>
+                    <option value="email">Email (Phishing Training)</option>
+                    <option value="video">Video (MP4)</option>
+                </select>
+            </div>
+
+            <!-- SCORM/HTML ZIP Upload Form -->
+            <form id="upload-form-zip" style="display:none;" onsubmit="uploadContent(event, 'zip')">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Default Domain (Optional)</label>
+                    <select name="domain_id" id="domain-select-zip" class="domain-select">
+                        <option value="">Use config default</option>
+                    </select>
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Select the default domain for this content's launch links</small>
+                </div>
+                <div class="form-group">
+                    <label>Thumbnail (Optional)</label>
+                    <input type="file" name="thumbnail" accept="image/*">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Upload a thumbnail image for the content listing (JPG, PNG, GIF, etc.)</small>
+                </div>
+                <div class="form-group">
+                    <label>ZIP File</label>
+                    <input type="file" name="file" accept=".zip" required>
+                </div>
+                <button type="submit">Upload and Process</button>
+            </form>
+
+            <!-- Raw HTML Form -->
+            <form id="upload-form-raw" style="display:none;" onsubmit="uploadContent(event, 'raw')">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Default Domain (Optional)</label>
+                    <select name="domain_id" id="domain-select-raw" class="domain-select">
+                        <option value="">Use config default</option>
+                    </select>
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Select the default domain for this content's launch links</small>
+                </div>
+                <div class="form-group">
+                    <label>Thumbnail (Optional)</label>
+                    <input type="file" name="thumbnail" accept="image/*">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Upload a thumbnail image for the content listing (JPG, PNG, GIF, etc.)</small>
+                </div>
+                <div class="form-group">
+                    <label>HTML Content</label>
+                    <textarea name="html_content" required placeholder="Paste your HTML content here..."></textarea>
+                </div>
+                <button type="submit">Upload and Process</button>
+            </form>
+
+            <!-- Email Form -->
+            <form id="upload-form-email" style="display:none;" onsubmit="uploadContent(event, 'email')">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Subject</label>
+                    <input type="text" name="email_subject" required>
+                </div>
+                <div class="form-group">
+                    <label>Email From Address</label>
+                    <input type="email" name="email_from" required>
+                </div>
+                <div class="form-group">
+                    <label>Default Domain (Optional)</label>
+                    <select name="domain_id" id="domain-select-email" class="domain-select">
+                        <option value="">Use config default</option>
+                    </select>
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Select the default domain for this content's launch links</small>
+                </div>
+                <div class="form-group">
+                    <label>Thumbnail (Optional)</label>
+                    <input type="file" name="thumbnail" accept="image/*">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Upload a thumbnail image for the content listing (JPG, PNG, GIF, etc.)</small>
+                </div>
+                <div class="form-group">
+                    <label>Email HTML Content</label>
+                    <textarea name="email_html" required placeholder="Paste the email HTML here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Email Attachment (Optional)</label>
+                    <input type="file" name="attachment">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Add a file attachment to the phishing email (e.g., PDF, DOC, XLS)</small>
+                </div>
+                <button type="submit">Upload and Process</button>
+            </form>
+
+            <!-- Video Form -->
+            <form id="upload-form-video" style="display:none;" onsubmit="uploadContent(event, 'video')">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Default Domain (Optional)</label>
+                    <select name="domain_id" id="domain-select-video" class="domain-select">
+                        <option value="">Use config default</option>
+                    </select>
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Select the default domain for this content's launch links</small>
+                </div>
+                <div class="form-group">
+                    <label>Thumbnail (Optional)</label>
+                    <input type="file" name="thumbnail" accept="image/*">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Upload a thumbnail image for the content listing (JPG, PNG, GIF, etc.)</small>
+                </div>
+                <div class="form-group">
+                    <label>Video File (MP4)</label>
+                    <input type="file" name="file" accept=".mp4,.webm,.ogg" required>
+                </div>
+                <button type="submit">Upload Video</button>
+            </form>
+        </div>
+
+        <!-- Manage Tab -->
+        <div id="manage-tab" class="tab-content">
+            <div id="manage-alert" class="alert"></div>
+            <button onclick="loadContent()" style="margin-bottom: 20px;">Refresh Content List</button>
+            <div id="content-list" class="content-list">
+                <div class="loading">Click "Refresh Content List" to load content</div>
+            </div>
+        </div>
+
+        <!-- Launch Link Tab -->
+        <div id="launch-tab" class="tab-content">
+            <div id="launch-alert" class="alert"></div>
+
+            <form onsubmit="generateLaunchLink(event)">
+                <div class="form-group">
+                    <label>Recipient ID</label>
+                    <input type="text" id="recipient-id" required placeholder="e.g., user-123">
+                </div>
+                <div class="form-group">
+                    <label>Recipient Email</label>
+                    <input type="email" id="recipient-email" placeholder="recipient@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Content ID</label>
+                    <input type="text" id="content-id" required placeholder="Paste content ID here">
+                </div>
+                <div class="form-group">
+                    <label>Override Domain (Optional)</label>
+                    <select id="launch-domain-id" class="domain-select">
+                        <option value="">Use content's default domain</option>
+                    </select>
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Override the content's default domain for this launch link</small>
+                </div>
+                <button type="submit">Generate Launch Link</button>
+            </form>
+
+            <div id="launch-result" style="display:none; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 4px;">
+                <h3>Launch Link Generated!</h3>
+                <p style="margin: 15px 0;">
+                    <strong>Link:</strong> <a id="launch-link" href="#" target="_blank"></a>
+                </p>
+                <button onclick="copyLaunchLink()">Copy Link</button>
+            </div>
+        </div>
+
+        <!-- Manage Domains Tab -->
+        <div id="domains-tab" class="tab-content">
+            <div id="domains-alert" class="alert"></div>
+
+            <h2 style="margin-bottom: 20px;">Add New Domain</h2>
+            <form onsubmit="addDomain(event)" style="margin-bottom: 40px;">
+                <div class="form-group">
+                    <label>Domain Name</label>
+                    <input type="text" id="domain-name" required placeholder="e.g., Production Server">
+                </div>
+                <div class="form-group">
+                    <label>Domain URL</label>
+                    <input type="text" id="domain-url" required placeholder="e.g., https://example.com">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Full URL including protocol (http:// or https://)</small>
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <textarea id="domain-description" placeholder="Description of this domain..."></textarea>
+                </div>
+                <button type="submit">Add Domain</button>
+            </form>
+
+            <h2 style="margin-bottom: 20px;">Existing Domains</h2>
+            <button onclick="loadDomains()" style="margin-bottom: 20px;">Refresh Domain List</button>
+            <div id="domains-list" class="content-list">
+                <div class="loading">Click "Refresh Domain List" to load domains</div>
+            </div>
+        </div>
+
+        <!-- Generate Direct Link Tab -->
+        <div id="directlink-tab" class="tab-content">
+            <div id="directlink-alert" class="alert"></div>
+
+            <p style="margin-bottom: 20px; padding: 15px; background: #e8f4f8; border-left: 4px solid #3498db; border-radius: 4px;">
+                <strong>Direct Link Method:</strong> This creates a training_tracking entry and generates a direct link using the format
+                <code>launch.php?trackingId=xyz</code>. This simulates what the external scheduling system will do.
+            </p>
+
+            <form onsubmit="generateDirectLink(event)">
+                <div class="form-group">
+                    <label>Content ID</label>
+                    <input type="text" id="direct-content-id" required placeholder="Paste content ID here">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Get this from the "Manage Content" tab</small>
+                </div>
+                <div class="form-group">
+                    <label>Recipient ID</label>
+                    <input type="text" id="direct-recipient-id" required placeholder="e.g., test-user-123">
+                    <small style="color: #7f8c8d; display: block; margin-top: 5px;">Will be created if doesn't exist</small>
+                </div>
+                <div class="form-group">
+                    <label>Recipient Email (Optional)</label>
+                    <input type="email" id="direct-recipient-email" placeholder="recipient@example.com">
+                </div>
+                <div class="form-group">
+                    <label>First Name (Optional)</label>
+                    <input type="text" id="direct-first-name" placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label>Last Name (Optional)</label>
+                    <input type="text" id="direct-last-name" placeholder="Doe">
+                </div>
+                <button type="submit">Generate Direct Link</button>
+            </form>
+
+            <div id="directlink-result" style="display:none; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 4px;">
+                <h3>Direct Link Generated!</h3>
+                <p style="margin: 15px 0;">
+                    <strong>Direct URL:</strong><br>
+                    <a id="direct-link" href="#" target="_blank" style="word-break: break-all;"></a>
+                </p>
+                <p style="margin: 15px 0;">
+                    <strong>Unique Tracking ID:</strong> <code id="direct-tracking-id"></code>
+                </p>
+                <p style="margin: 15px 0;">
+                    <strong>Training Tracking ID:</strong> <code id="direct-tt-id"></code>
+                </p>
+                <button onclick="copyDirectLink()">Copy Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-detect base path - api and public are siblings, so go up from public directory
+        const currentPath = window.location.pathname;
+        let basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+        // Remove /public from the path if present (api and public are sibling directories)
+        if (basePath.endsWith('/public')) {
+            basePath = basePath.substring(0, basePath.lastIndexOf('/'));
+        }
+        const API_BASE = basePath + '/api';
+
+        // API Configuration
+        // Set your bearer token from config/config.php here
+        const BEARER_TOKEN = '45780363-a30a-4009-b4bc-e897aaa1a4f1';
+
+        // Helper function to get headers with bearer token
+        function getAuthHeaders(additionalHeaders = {}) {
+            return {
+                'Authorization': 'Bearer ' + BEARER_TOKEN,
+                ...additionalHeaders
+            };
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showUploadForm() {
+            const contentType = document.getElementById('content-type-selector').value;
+
+            // Hide all forms
+            document.querySelectorAll('[id^="upload-form-"]').forEach(form => {
+                form.style.display = 'none';
+            });
+
+            // Show appropriate form
+            if (contentType === 'scorm' || contentType === 'html') {
+                document.getElementById('upload-form-zip').style.display = 'block';
+            } else if (contentType === 'training' || contentType === 'landing') {
+                document.getElementById('upload-form-raw').style.display = 'block';
+            } else if (contentType === 'email') {
+                document.getElementById('upload-form-email').style.display = 'block';
+            } else if (contentType === 'video') {
+                document.getElementById('upload-form-video').style.display = 'block';
+            }
+        }
+
+        async function uploadContent(event, formType) {
+            event.preventDefault();
+
+            const contentType = document.getElementById('content-type-selector').value;
+            const form = event.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            try {
+                const formData = new FormData(form);
+                formData.append('content_type', contentType);
+
+                // Add domain_id if selected (empty string means use default)
+                const domainSelect = form.querySelector('select[name="domain_id"]');
+                if (domainSelect && domainSelect.value) {
+                    formData.append('domain_id', domainSelect.value);
+                }
+
+                const response = await fetch(API_BASE + '/upload.php', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    let message = `Content uploaded successfully! ID: ${escapeHtml(result.content_id)}`;
+
+                    if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
+                        message += `<br>Tags: ${result.tags.map(t => escapeHtml(t)).join(', ')}`;
+                    }
+
+                    if (result.cues && Array.isArray(result.cues) && result.cues.length > 0) {
+                        message += `<br>Cues: ${result.cues.map(c => escapeHtml(c)).join(', ')}`;
+                    }
+
+                    if (result.difficulty) {
+                        const difficultyLabels = {1: 'Least Difficult', 2: 'Moderately Difficult', 3: 'Very Difficult'};
+                        message += `<br>Difficulty: ${difficultyLabels[result.difficulty] || result.difficulty}`;
+                    }
+
+                    if (result.attachment_filename) {
+                        const sizeKB = Math.round(result.attachment_size / 1024);
+                        message += `<br>Attachment: ${escapeHtml(result.attachment_filename)} (${sizeKB} KB)`;
+                    }
+
+                    if (result.preview_url) {
+                        message += `<br><a href="${escapeHtml(result.preview_url)}" target="_blank" style="color: #fff; text-decoration: underline;">Preview Content</a>`;
+                    }
+
+                    showAlert('upload-alert', 'success', message);
+                    form.reset();
+                } else {
+                    showAlert('upload-alert', 'error', escapeHtml(result.error) || 'Upload failed');
+                }
+            } catch (error) {
+                showAlert('upload-alert', 'error', 'Upload failed: ' + escapeHtml(error.message));
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = formType === 'video' ? 'Upload Video' : 'Upload and Process';
+            }
+        }
+
+        async function loadContent() {
+            const contentList = document.getElementById('content-list');
+            contentList.innerHTML = '<div class="loading">Loading content...</div>';
+
+            try {
+                const response = await fetch(API_BASE + '/list-content.php', {
+                    headers: getAuthHeaders()
+                });
+                const result = await response.json();
+
+                if (result.success && result.content.length > 0) {
+                    contentList.innerHTML = result.content.map(item => {
+                        const thumbnailHtml = item.thumbnail_filename
+                            ? `<img src="${API_BASE}/thumbnail.php?id=${escapeHtml(item.id)}" alt="Thumbnail" class="content-thumbnail" onerror="this.style.display='none'">`
+                            : `<div class="content-thumbnail-placeholder">No<br>Image</div>`;
+
+                        return `
+                            <div class="content-item">
+                                ${thumbnailHtml}
+                                <div class="content-info">
+                                    <h3>${escapeHtml(item.title)}</h3>
+                                    <p>Type: ${escapeHtml(item.content_type)} | ID: ${escapeHtml(item.id)}${item.difficulty ? ` | Difficulty: ${escapeHtml(item.difficulty)}` : ''}</p>
+                                    ${item.tags ? `<div class="tags">${item.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
+                                </div>
+                                <div class="content-actions">
+                                    <button class="copy-id-btn" data-content-id="${escapeHtml(item.id)}">Copy ID</button>
+                                    ${item.content_preview ? `<button class="preview-btn" data-preview-url="${escapeHtml(item.content_preview)}">Preview</button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Attach event listeners to avoid JavaScript context XSS
+                    document.querySelectorAll('.copy-id-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            copyToClipboard(this.getAttribute('data-content-id'));
+                        });
+                    });
+
+                    document.querySelectorAll('.preview-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            window.open(this.getAttribute('data-preview-url'), '_blank');
+                        });
+                    });
+                } else {
+                    contentList.innerHTML = '<div class="loading">No content found</div>';
+                }
+            } catch (error) {
+                contentList.innerHTML = '<div class="loading">Failed to load content</div>';
+                showAlert('manage-alert', 'error', 'Failed to load content: ' + escapeHtml(error.message));
+            }
+        }
+
+        async function generateLaunchLink(event) {
+            event.preventDefault();
+
+            const recipientId = document.getElementById('recipient-id').value;
+            const recipientEmail = document.getElementById('recipient-email').value;
+            const contentId = document.getElementById('content-id').value;
+            const domainId = document.getElementById('launch-domain-id').value;
+
+            const requestData = {
+                recipient_id: recipientId,
+                content_id: contentId,
+                email: recipientEmail
+            };
+
+            // Add domain_id if selected (override the content's default domain)
+            if (domainId) {
+                requestData.domain_id = domainId;
+            }
+
+            try {
+                const response = await fetch(API_BASE + '/launch-link.php', {
+                    method: 'POST',
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const launchLink = result.launch_url;
+                    document.getElementById('launch-link').href = launchLink;
+                    document.getElementById('launch-link').textContent = launchLink;
+                    document.getElementById('launch-result').style.display = 'block';
+                    showAlert('launch-alert', 'success', 'Launch link generated successfully!');
+                } else {
+                    showAlert('launch-alert', 'error', escapeHtml(result.error) || 'Failed to generate launch link');
+                }
+            } catch (error) {
+                showAlert('launch-alert', 'error', 'Failed to generate launch link: ' + escapeHtml(error.message));
+            }
+        }
+
+        function copyLaunchLink() {
+            const link = document.getElementById('launch-link').textContent;
+            copyToClipboard(link);
+            showAlert('launch-alert', 'success', 'Link copied to clipboard!');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+        }
+
+        // HTML escape function to prevent XSS
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function showAlert(elementId, type, message) {
+            const alert = document.getElementById(elementId);
+            alert.className = 'alert ' + type + ' show';
+            alert.innerHTML = message;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Domain Management Functions
+        async function loadDomains(populateSelects = false) {
+            const domainsList = document.getElementById('domains-list');
+            if (domainsList) {
+                domainsList.innerHTML = '<div class="loading">Loading domains...</div>';
+            }
+
+            try {
+                const response = await fetch(API_BASE + '/domains.php', {
+                    headers: getAuthHeaders()
+                });
+                const result = await response.json();
+
+                if (result.success && result.domains.length > 0) {
+                    // Update the domains list display
+                    if (domainsList) {
+                        domainsList.innerHTML = result.domains.map(domain => {
+                            const statusBadge = domain.is_active
+                                ? '<span style="background: #27ae60; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-left: 10px;">Active</span>'
+                                : '<span style="background: #e74c3c; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-left: 10px;">Inactive</span>';
+
+                            return `
+                                <div class="content-item">
+                                    <div class="content-info">
+                                        <h3>${escapeHtml(domain.name)}${statusBadge}</h3>
+                                        <p><strong>URL:</strong> ${escapeHtml(domain.domain_url)}</p>
+                                        ${domain.description ? `<p>${escapeHtml(domain.description)}</p>` : ''}
+                                        <p style="color: #95a5a6; font-size: 12px; margin-top: 5px;">ID: ${escapeHtml(domain.id)}</p>
+                                    </div>
+                                    <div class="content-actions">
+                                        <button class="copy-domain-id-btn" data-domain-id="${escapeHtml(domain.id)}">Copy ID</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        // Attach event listeners
+                        document.querySelectorAll('.copy-domain-id-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                copyToClipboard(this.getAttribute('data-domain-id'));
+                                showAlert('domains-alert', 'success', 'Domain ID copied to clipboard!');
+                            });
+                        });
+                    }
+
+                    // Populate all domain select dropdowns if requested
+                    if (populateSelects) {
+                        populateDomainSelects(result.domains);
+                    }
+                } else {
+                    if (domainsList) {
+                        domainsList.innerHTML = '<div class="loading">No domains found</div>';
+                    }
+                }
+
+                return result.domains || [];
+            } catch (error) {
+                if (domainsList) {
+                    domainsList.innerHTML = '<div class="loading">Failed to load domains</div>';
+                }
+                console.error('Failed to load domains:', error);
+                return [];
+            }
+        }
+
+        function populateDomainSelects(domains) {
+            const selects = document.querySelectorAll('.domain-select');
+            selects.forEach(select => {
+                // Keep the default option
+                const defaultOption = select.querySelector('option[value=""]');
+                select.innerHTML = '';
+                if (defaultOption) {
+                    select.appendChild(defaultOption);
+                }
+
+                // Add domain options (only active domains)
+                domains.filter(d => d.is_active).forEach(domain => {
+                    const option = document.createElement('option');
+                    option.value = domain.id;
+                    option.textContent = `${domain.name} (${domain.domain_url})`;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        async function addDomain(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('domain-name').value;
+            const url = document.getElementById('domain-url').value;
+            const description = document.getElementById('domain-description').value;
+
+            try {
+                const response = await fetch(API_BASE + '/domains.php', {
+                    method: 'POST',
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify({
+                        name: name,
+                        domain_url: url,
+                        description: description,
+                        is_active: true
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('domains-alert', 'success', `Domain "${escapeHtml(name)}" added successfully!`);
+
+                    // Clear form
+                    document.getElementById('domain-name').value = '';
+                    document.getElementById('domain-url').value = '';
+                    document.getElementById('domain-description').value = '';
+
+                    // Reload domains list and populate selects
+                    await loadDomains(true);
+                } else {
+                    showAlert('domains-alert', 'error', escapeHtml(result.error) || 'Failed to add domain');
+                }
+            } catch (error) {
+                showAlert('domains-alert', 'error', 'Failed to add domain: ' + escapeHtml(error.message));
+            }
+        }
+
+        // Generate Direct Link Functions
+        async function generateDirectLink(event) {
+            event.preventDefault();
+
+            const contentId = document.getElementById('direct-content-id').value;
+            const recipientId = document.getElementById('direct-recipient-id').value;
+            const email = document.getElementById('direct-recipient-email').value;
+            const firstName = document.getElementById('direct-first-name').value;
+            const lastName = document.getElementById('direct-last-name').value;
+
+            try {
+                const response = await fetch(API_BASE + '/generate-direct-link.php', {
+                    method: 'POST',
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify({
+                        content_id: contentId,
+                        recipient_id: recipientId,
+                        email: email,
+                        first_name: firstName,
+                        last_name: lastName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Display the direct link
+                    document.getElementById('direct-link').href = result.direct_url;
+                    document.getElementById('direct-link').textContent = result.direct_url;
+                    document.getElementById('direct-tracking-id').textContent = result.unique_tracking_id;
+                    document.getElementById('direct-tt-id').textContent = result.tracking_id;
+                    document.getElementById('directlink-result').style.display = 'block';
+
+                    showAlert('directlink-alert', 'success',
+                        `Direct link generated! Content: ${escapeHtml(result.content.title)}`);
+                } else {
+                    showAlert('directlink-alert', 'error', escapeHtml(result.error) || 'Failed to generate direct link');
+                }
+            } catch (error) {
+                showAlert('directlink-alert', 'error', 'Failed to generate direct link: ' + escapeHtml(error.message));
+            }
+        }
+
+        function copyDirectLink() {
+            const link = document.getElementById('direct-link').textContent;
+            copyToClipboard(link);
+            showAlert('directlink-alert', 'success', 'Direct link copied to clipboard!');
+        }
+
+        // Load domains into dropdowns when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Load domains and populate all select dropdowns
+            await loadDomains(true);
+        });
+    </script>
+</body>
+</html>
